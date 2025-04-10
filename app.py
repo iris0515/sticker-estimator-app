@@ -105,7 +105,8 @@ with tab2:
 
             st.success(f"단가: {format_result(unit)}원")
             st.info(f"총 가격: {format_result(total)}원")
-         with tab3:
+
+with tab3:
     st.markdown("### 📦 일반 / 완칼 / 헤다포장 계산기")
 
     with st.expander("📋 일반 견적 계산기"):
