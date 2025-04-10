@@ -127,6 +127,7 @@ with tab1:
             st.info(f"📄 기본 수량 기준: {format_result(total_needed_sheets)}장")
             st.write(f"💡 완칼 기준 수량 (아임 기준 20개): {format_result(im_basis)}장")
             st.write(f"💡 완칼 기준 수량 (스티키 기준 16개): {format_result(sticky_basis)}장")
+
 with tab3:
     st.markdown("### 📋 일반 / 완칼 / 작가 견적 계산기")
 
