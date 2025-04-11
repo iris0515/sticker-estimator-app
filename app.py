@@ -67,18 +67,20 @@ with tab1:
             st.info(f"📄 기본 수량 기준: {format_result(total_needed_sheets)}장")
             st.write(f"💡 완칼 기준 수량 (아임 기준 20개): {format_result(im_basis)}장")
             st.write(f"💡 완칼 기준 수량 (스티키 기준 16개): {format_result(sticky_basis)}장")
+
+# ---------------- TAB 2: 헤다포장 계산기 ----------------
 with tab2:
     st.markdown("### 📦 헤다포장 견적 계산기 (업그레이드)")
 
     st.subheader("1️⃣ 헤다 면적 계산기")
-    col1, col2 = st.columns(2)
-    width = col1.number_input("가로길이 (mm)", min_value=1.0, value=50.0)
-    height = col2.number_input("세로길이 (mm)", min_value=1.0, value=50.0)
+    col1_heda, col2_heda = st.columns(2)
+    width_h = col1_heda.number_input("가로(mm)", min_value=1.0, value=50.0, key="heda_width")
+    height_h = col2_heda.number_input("세로(mm)", min_value=1.0, value=50.0, key="heda_height")
 
-    if st.button("면적 계산"):
+    if st.button("면적 계산", key="heda_area_btn"):
         container_width, container_height = 255, 385
-        num_width = math.floor(container_width / width)
-        num_height = math.floor(container_height / height)
+        num_width = math.floor(container_width / width_h)
+        num_height = math.floor(container_height / height_h)
         total = num_width * num_height
         if total == 0:
             st.error("❌ 입력한 크기의 아이템이 컨테이너에 들어가지 않습니다.")
@@ -86,84 +88,76 @@ with tab2:
             st.success(f"✅ 한 장에 최대 {total}개 들어갈 수 있습니다.")
 
     st.divider()
-
     st.subheader("2️⃣ 헤다 견적 계산기")
+    col3_heda, col4_heda = st.columns(2)
+    quantity = col3_heda.number_input("헤다 수량", min_value=10, value=100, step=10, key="heda_quantity")
+    batch_under_9 = col4_heda.checkbox("9개 이하 배치 (장당 +50원)", key="heda_under_9")
+    sticker_included = col4_heda.checkbox("스티커 포함 (장당 -50원)", key="heda_with_sticker")
 
-    col3, col4 = st.columns(2)
-    quantity = col3.number_input("헤다 수량", min_value=10, value=100, step=10)
-    batch_under_9 = col4.checkbox("9개 이하 배치 (장당 +50원)")
-    sticker_included = col4.checkbox("스티커 주문 포함 (장당 -50원)")
+    if st.button("헤다 견적 계산", key="heda_price_btn"):
+        if quantity >= 500:
+            heda_unit = 250
+        elif quantity >= 300:
+            heda_unit = 300
+        elif quantity >= 200:
+            heda_unit = 350
+        elif quantity >= 100:
+            heda_unit = 400
+        else:
+            heda_unit = 450
 
-    # 단가 계산
-    if quantity >= 500:
-        heda_unit = 250
-    elif quantity >= 300:
-        heda_unit = 300
-    elif quantity >= 200:
-        heda_unit = 350
-    elif quantity >= 100:
-        heda_unit = 400
-    else:
-        heda_unit = 450
+        if batch_under_9:
+            heda_unit += 50
+        if sticker_included:
+            heda_unit -= 50
 
-    if batch_under_9:
-        heda_unit += 50
-    if sticker_included:
-        heda_unit -= 50
+        heda_total = quantity * heda_unit
 
-    heda_total = quantity * heda_unit
-
-    st.info(f"헤다 단가: {format_result(heda_unit)}원")
-    st.success(f"헤다 견적 합계: {format_result(heda_total)}원")
+        st.info(f"헤다 단가: {format_result(heda_unit)}원")
+        st.success(f"헤다 견적 합계: {format_result(heda_total)}원")
 
     st.divider()
-
     st.subheader("3️⃣ 포장 견적 계산기")
+    col5_heda, col6_heda = st.columns(2)
+    qty_p = col5_heda.number_input("포장 수량", min_value=10, value=100, step=10, key="pack_qty")
+    header_add = col6_heda.checkbox("헤더 장착 (장당 +200원)", key="pack_header")
+    over_8_types = col6_heda.checkbox("8종 이상 (장당 +100원)", key="pack_8types")
+    over_12_types = col6_heda.checkbox("12종 이상 (장당 +200원)", key="pack_12types")
+    opp_cost = col6_heda.checkbox("OPP 포장비용 (장당 +50원)", key="pack_opp")
 
-    col5, col6 = st.columns(2)
-    qty = col5.number_input("포장 수량", min_value=10, value=100, step=10)
-    header_add = col6.checkbox("헤더 장착 (장당 +200원)")
-    over_8_types = col6.checkbox("8종 이상 (장당 +100원)")
-    over_12_types = col6.checkbox("12종 이상 (장당 +200원)")
-    opp_cost = col6.checkbox("OPP 포장비용 (장당 +50원)")
+    if st.button("포장 견적 계산", key="pack_price_btn"):
+        if qty_p >= 400:
+            packaging_unit = 200
+        elif qty_p >= 300:
+            packaging_unit = 250
+        elif qty_p >= 200:
+            packaging_unit = 300
+        elif qty_p >= 100:
+            packaging_unit = 400
+        else:
+            packaging_unit = 500
 
-    # 포장 단가 계산
-    if qty >= 400:
-        packaging_unit = 200
-    elif qty >= 300:
-        packaging_unit = 250
-    elif qty >= 200:
-        packaging_unit = 300
-    elif qty >= 100:
-        packaging_unit = 400
-    else:
-        packaging_unit = 500
+        if header_add:
+            packaging_unit += 200
+        if over_8_types:
+            packaging_unit += 100
+        if over_12_types:
+            packaging_unit += 200
+        if opp_cost:
+            packaging_unit += 50
 
-    if header_add:
-        packaging_unit += 200
-    if over_8_types:
-        packaging_unit += 100
-    if over_12_types:
-        packaging_unit += 200
-    if opp_cost:
-        packaging_unit += 50
+        packaging_total = qty_p * packaging_unit
 
-    packaging_total = qty * packaging_unit
+        st.info(f"포장 단가: {format_result(packaging_unit)}원")
+        st.success(f"포장 견적 합계: {format_result(packaging_total)}원")
 
-    st.info(f"포장 단가: {format_result(packaging_unit)}원")
-    st.success(f"포장 견적 합계: {format_result(packaging_total)}원")
+        total_sum = heda_total + packaging_total
+        total_unit_price = heda_unit + packaging_unit
+        st.success(f"총 견적: {format_result(total_sum)}원")
+        st.info(f"장당 총합 단가: {format_result(total_unit_price)}원")
 
-    st.divider()
-
-    st.subheader("💰 총 합계")
-
-    total_sum = heda_total + packaging_total
-    total_unit_price = heda_unit + packaging_unit
-
-    st.success(f"총 견적: {format_result(total_sum)}원")
-    st.info(f"장당 총합 단가: {format_result(total_unit_price)}원")
-
-
+# ---------------- TAB 3 ----------------
+with tab3:
     st.markdown("### 📋 일반 / 완칼 / 작가 견적 계산기")
 
     # 📋 일반 견적 계산기
